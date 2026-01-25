@@ -1,0 +1,476 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>FinSmart Admin Dashboard</title>
+
+    <!-- PWA Meta Tags -->
+    <meta name="description" content="Tableau de bord d'administration pour FinSmart - Gestion des utilisateurs, objectifs et analytics">
+    <meta name="theme-color" content="#4F46E5">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="FinSmart Admin">
+    <meta name="mobile-web-app-capable" content="yes">
+
+    <!-- Apple Touch Icons -->
+    <link rel="apple-touch-icon" sizes="72x72" href="/icons/icon-72x72.png">
+    <link rel="apple-touch-icon" sizes="96x96" href="/icons/icon-96x96.png">
+    <link rel="apple-touch-icon" sizes="128x128" href="/icons/icon-128x128.png">
+    <link rel="apple-touch-icon" sizes="144x144" href="/icons/icon-144x144.png">
+    <link rel="apple-touch-icon" sizes="152x152" href="/icons/icon-152x152.png">
+    <link rel="apple-touch-icon" sizes="192x192" href="/icons/icon-192x192.png">
+    <link rel="apple-touch-icon" sizes="384x384" href="/icons/icon-384x384.png">
+    <link rel="apple-touch-icon" sizes="512x512" href="/icons/icon-512x512.png">
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" sizes="32x32" href="/icons/icon-32x32.png">
+    <link rel="icon" type="image/png" sizes="16x16" href="/icons/icon-16x16.png">
+
+    <!-- PWA Manifest -->
+    <link rel="manifest" href="/manifest.json">
+
+    <!-- Styles -->
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Screen -->
+    <div id="loginScreen" class="screen">
+        <div class="login-container">
+            <div class="logo">
+                <h1>📊 FinSmart Admin</h1>
+                <p>Analytics Dashboard</p>
+            </div>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="email">Email</label>
+                    <input type="email" id="email" required placeholder="admin@finsmart.com">
+                </div>
+                <div class="form-group">
+                    <label for="password">Password</label>
+                    <input type="password" id="password" required placeholder="••••••••">
+                </div>
+                <button type="submit" class="btn-primary">Login</button>
+                <div id="loginError" class="error-message"></div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Dashboard Screen -->
+    <div id="dashboardScreen" class="screen hidden">
+        <header class="header">
+            <h1>📊 FinSmart Admin Dashboard</h1>
+            <div class="header-actions">
+                <span id="adminEmail" class="admin-email"></span>
+                <button id="logoutBtn" class="btn-secondary">Logout</button>
+            </div>
+        </header>
+
+        <main class="dashboard-content">
+            <!-- Navigation Tabs -->
+            <div class="nav-tabs">
+                <button class="nav-tab active" data-tab="analytics">📊 Analytics</button>
+                <button class="nav-tab" data-tab="users">👥 Users</button>
+                <button class="nav-tab" data-tab="goals">🎯 Goals</button>
+                <button class="nav-tab" data-tab="notifications">
+                    🔔 Notifications
+                    <span class="unread-badge hidden" id="headerUnreadCount">0</span>
+                </button>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analyticsTab" class="tab-content active">
+                <!-- Period Selector -->
+                <div class="period-selector">
+                    <button class="period-btn active" data-period="7days">7 Days</button>
+                    <button class="period-btn" data-period="30days">30 Days</button>
+                    <button class="period-btn" data-period="90days">90 Days</button>
+                </div>
+
+            <!-- Loading State -->
+            <div id="loadingState" class="loading">
+                <div class="spinner"></div>
+                <p>Loading metrics...</p>
+            </div>
+
+            <!-- Metrics Content -->
+            <div id="metricsContent" class="hidden">
+                <!-- Overview Stats -->
+                <section class="metrics-section">
+                    <h2>Overview</h2>
+                    <div class="stats-grid">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalUsers">0</div>
+                            <div class="stat-label">Total Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="newUsers">0</div>
+                            <div class="stat-label">New Users</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalGoals">0</div>
+                            <div class="stat-label">Total Goals</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="completedGoals">0</div>
+                            <div class="stat-label">Completed Goals</div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Success Metrics -->
+                <section class="metrics-section">
+                    <h2>Success Metrics</h2>
+                    <div class="metrics-list">
+                        <div class="metric-row">
+                            <span class="metric-label">Goals Creation Rate (7 days)</span>
+                            <span class="metric-value" id="goalsCreationRate">0%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Retention Rate (7 days)</span>
+                            <span class="metric-value" id="retentionRate">0%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Goal Success Rate</span>
+                            <span class="metric-value" id="goalSuccessRate">0%</span>
+                        </div>
+                        <div class="metric-row">
+                            <span class="metric-label">Weekly Active Users</span>
+                            <span class="metric-value" id="avgWeeklyUsage">0</span>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Daily Active Users Chart -->
+                <section class="metrics-section">
+                    <h2>Daily Active Users (Last 7 Days)</h2>
+                    <div class="chart-container" id="dauChart"></div>
+                </section>
+
+                <!-- Events Breakdown -->
+                <section class="metrics-section">
+                    <h2>Events Breakdown</h2>
+                    <div id="eventsBreakdown" class="metrics-list"></div>
+                </section>
+
+                <!-- Goal Distribution -->
+                <section class="metrics-section">
+                    <h2>Goals by Category</h2>
+                    <div id="goalsByCategory" class="metrics-list"></div>
+                </section>
+
+                <section class="metrics-section">
+                    <h2>Goals by Timeframe</h2>
+                    <div id="goalsByTimeframe" class="metrics-list"></div>
+                </section>
+            </div>
+            </div>
+
+            <!-- Users Management Tab -->
+            <div id="usersTab" class="tab-content">
+                <!-- Search and Filters -->
+                <div class="search-bar">
+                    <input type="text" id="userSearch" placeholder="Search users by name, email, username...">
+                    <select id="roleFilter">
+                        <option value="">All Roles</option>
+                        <option value="user">Users</option>
+                        <option value="admin">Admins</option>
+                    </select>
+                    <button id="searchUsersBtn" class="btn-primary">Search</button>
+                </div>
+
+                <!-- Users Table -->
+                <section class="metrics-section">
+                    <h2>Users Management</h2>
+                    <div id="usersLoading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <p>Loading users...</p>
+                    </div>
+                    <div id="usersTable"></div>
+                    <div id="usersPagination" class="pagination"></div>
+                </section>
+            </div>
+
+            <!-- Goals Management Tab -->
+            <div id="goalsTab" class="tab-content">
+                <!-- Search and Filters -->
+                <div class="search-bar">
+                    <select id="categoryFilter">
+                        <option value="">All Categories</option>
+                        <option value="survival">Survival</option>
+                        <option value="necessity">Necessity</option>
+                        <option value="lifestyle">Lifestyle</option>
+                    </select>
+                    <select id="timeframeFilter">
+                        <option value="">All Timeframes</option>
+                        <option value="short">Short Term</option>
+                        <option value="long">Long Term</option>
+                    </select>
+                    <select id="statusFilter">
+                        <option value="">All Status</option>
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="paused">Paused</option>
+                    </select>
+                    <button id="searchGoalsBtn" class="btn-primary">Search</button>
+                </div>
+
+                <!-- Goals Table -->
+                <section class="metrics-section">
+                    <h2>Goals Management</h2>
+                    <div id="goalsLoading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <p>Loading goals...</p>
+                    </div>
+                    <div id="goalsTable"></div>
+                    <div id="goalsPagination" class="pagination"></div>
+                </section>
+            </div>
+
+            <!-- Notifications Tab -->
+            <div id="notificationsTab" class="tab-content">
+                <!-- Header with actions -->
+                <div class="notifications-header">
+                    <h2>Notifications</h2>
+                    <div class="notifications-actions">
+                        <span class="unread-count" id="unreadCountDisplay">0 unread</span>
+                        <button id="markAllReadBtn" class="btn-secondary">Mark all as read</button>
+                        <button id="cleanupNotificationsBtn" class="btn-secondary">Cleanup old</button>
+                    </div>
+                </div>
+
+                <!-- Filters -->
+                <div class="search-bar">
+                    <select id="notifTypeFilter">
+                        <option value="">All Types</option>
+                        <option value="user_registered">👤 New Users</option>
+                        <option value="user_first_goal">🎯 First Goals</option>
+                        <option value="goal_completed">✅ Completed Goals</option>
+                        <option value="goal_high_value">💰 High Value Goals</option>
+                        <option value="user_milestone">🏅 Milestones</option>
+                        <option value="admin_action">⚙️ Admin Actions</option>
+                        <option value="suspicious_activity">⚠️ Suspicious Activity</option>
+                    </select>
+                    <select id="notifSeverityFilter">
+                        <option value="">All Severities</option>
+                        <option value="info">ℹ️ Info</option>
+                        <option value="success">✅ Success</option>
+                        <option value="warning">⚠️ Warning</option>
+                        <option value="critical">🚨 Critical</option>
+                    </select>
+                    <select id="notifReadFilter">
+                        <option value="">All</option>
+                        <option value="false">Unread Only</option>
+                        <option value="true">Read Only</option>
+                    </select>
+                    <button id="filterNotificationsBtn" class="btn-primary">Filter</button>
+                </div>
+
+                <!-- Notifications List -->
+                <section class="metrics-section">
+                    <div id="notificationsLoading" class="loading hidden">
+                        <div class="spinner"></div>
+                        <p>Loading notifications...</p>
+                    </div>
+                    <div id="notificationsList"></div>
+                    <div id="notificationsPagination" class="pagination"></div>
+                </section>
+
+                <!-- Stats Summary -->
+                <section class="metrics-section">
+                    <h2>Notification Statistics</h2>
+                    <div class="stats-grid" id="notificationStats">
+                        <div class="stat-card">
+                            <div class="stat-number" id="totalNotifications">0</div>
+                            <div class="stat-label">Total</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="unreadNotifications">0</div>
+                            <div class="stat-label">Unread</div>
+                        </div>
+                        <div class="stat-card">
+                            <div class="stat-number" id="recent24hNotifications">0</div>
+                            <div class="stat-label">Last 24h</div>
+                        </div>
+                    </div>
+                </section>
+            </div>
+        </main>
+    </div>
+
+    <!-- Edit User Modal -->
+    <div id="editUserModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="closeEditUser">&times;</span>
+            <h2>Edit User</h2>
+            <form id="editUserForm">
+                <input type="hidden" id="editUserId">
+                <div class="form-group">
+                    <label>Username</label>
+                    <input type="text" id="editUsername" required>
+                </div>
+                <div class="form-group">
+                    <label>Email</label>
+                    <input type="email" id="editEmail" required>
+                </div>
+                <div class="form-group">
+                    <label>Role</label>
+                    <select id="editRole">
+                        <option value="user">User</option>
+                        <option value="admin">Admin</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="button" class="btn-secondary" id="cancelEditUser">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Edit Goal Modal -->
+    <div id="editGoalModal" class="modal hidden">
+        <div class="modal-content">
+            <span class="close-modal" id="closeEditGoal">&times;</span>
+            <h2>Edit Goal</h2>
+            <form id="editGoalForm">
+                <input type="hidden" id="editGoalId">
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" id="editGoalName" required>
+                </div>
+                <div class="form-group">
+                    <label>Current Amount</label>
+                    <input type="number" id="editGoalCurrent" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Target Amount</label>
+                    <input type="number" id="editGoalTarget" step="0.01" required>
+                </div>
+                <div class="form-group">
+                    <label>Status</label>
+                    <select id="editGoalStatus">
+                        <option value="active">Active</option>
+                        <option value="completed">Completed</option>
+                        <option value="paused">Paused</option>
+                    </select>
+                </div>
+                <div class="modal-actions">
+                    <button type="submit" class="btn-primary">Save Changes</button>
+                    <button type="button" class="btn-secondary" id="cancelEditGoal">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Toast Notification -->
+    <div id="toast" class="toast hidden"></div>
+
+    <!-- Install PWA Prompt -->
+    <div id="installPrompt" class="install-prompt hidden">
+        <div class="install-prompt-content">
+            <h3>📱 Installer FinSmart Admin</h3>
+            <p>Installez l'application sur votre appareil pour un accès rapide et une meilleure expérience.</p>
+            <div class="install-prompt-actions">
+                <button id="installBtn" class="btn-primary">Installer</button>
+                <button id="dismissInstallBtn" class="btn-secondary">Plus tard</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="app.js"></script>
+
+    <!-- PWA Service Worker Registration -->
+    <script>
+        // Enregistrer le Service Worker
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then((registration) => {
+                        console.log('✅ Service Worker enregistré avec succès:', registration.scope);
+
+                        // Vérifier les mises à jour
+                        registration.addEventListener('updatefound', () => {
+                            const newWorker = registration.installing;
+                            newWorker.addEventListener('statechange', () => {
+                                if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                                    // Nouvelle version disponible
+                                    if (confirm('Une nouvelle version est disponible. Voulez-vous actualiser ?')) {
+                                        window.location.reload();
+                                    }
+                                }
+                            });
+                        });
+                    })
+                    .catch((error) => {
+                        console.error('❌ Erreur lors de l\'enregistrement du Service Worker:', error);
+                    });
+            });
+        }
+
+        // Gérer l'installation de la PWA
+        let deferredPrompt;
+        const installPrompt = document.getElementById('installPrompt');
+        const installBtn = document.getElementById('installBtn');
+        const dismissInstallBtn = document.getElementById('dismissInstallBtn');
+
+        // Écouter l'événement beforeinstallprompt
+        window.addEventListener('beforeinstallprompt', (e) => {
+            // Empêcher l'affichage automatique du prompt
+            e.preventDefault();
+            deferredPrompt = e;
+
+            // Vérifier si l'utilisateur a déjà refusé
+            const installDismissed = localStorage.getItem('installDismissed');
+            const dismissTime = localStorage.getItem('installDismissTime');
+
+            // Afficher le prompt personnalisé si pas refusé récemment (24h)
+            if (!installDismissed || (Date.now() - dismissTime > 86400000)) {
+                setTimeout(() => {
+                    installPrompt.classList.remove('hidden');
+                }, 3000); // Afficher après 3 secondes
+            }
+        });
+
+        // Gérer le clic sur le bouton Installer
+        if (installBtn) {
+            installBtn.addEventListener('click', async () => {
+                if (!deferredPrompt) return;
+
+                // Afficher le prompt d'installation
+                deferredPrompt.prompt();
+
+                // Attendre le choix de l'utilisateur
+                const { outcome } = await deferredPrompt.userChoice;
+                console.log(`Installation ${outcome === 'accepted' ? 'acceptée' : 'refusée'}`);
+
+                // Réinitialiser le prompt
+                deferredPrompt = null;
+                installPrompt.classList.add('hidden');
+            });
+        }
+
+        // Gérer le clic sur le bouton Plus tard
+        if (dismissInstallBtn) {
+            dismissInstallBtn.addEventListener('click', () => {
+                installPrompt.classList.add('hidden');
+                localStorage.setItem('installDismissed', 'true');
+                localStorage.setItem('installDismissTime', Date.now().toString());
+            });
+        }
+
+        // Détecter si l'app est installée
+        window.addEventListener('appinstalled', () => {
+            console.log('✅ PWA installée avec succès');
+            installPrompt.classList.add('hidden');
+            deferredPrompt = null;
+        });
+
+        // Mode standalone (app installée)
+        if (window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true) {
+            console.log('📱 Application lancée en mode standalone');
+            // Vous pouvez ajouter des fonctionnalités spécifiques au mode standalone ici
+        }
+    </script>
+</body>
+</html>

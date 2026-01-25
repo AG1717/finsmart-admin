@@ -1,0 +1,52 @@
+# Dependencies
+node_modules/
+package-lock.json
+yarn.lock
+
+# Build outputs
+dist/
+build/
+
+# Environment variables
+.env
+.env.local
+.env.production
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# Logs
+*.log
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Testing
+coverage/
+.nyc_output/
+
+# Certificates (pour tests HTTPS locaux)
+*.pem
+*.key
+*.crt
+
+# Cache
+.cache/
+.parcel-cache/
+
+# Netlify
+.netlify/
+
+# Service Worker cache (généré automatiquement)
+sw.js.map
+
+.vercel

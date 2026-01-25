@@ -1,0 +1,40 @@
+{
+  "name": "finsmart-admin-pwa",
+  "version": "1.0.0",
+  "description": "FinSmart Admin Dashboard - Progressive Web App",
+  "main": "app.js",
+  "scripts": {
+    "generate-icons": "node generate-icons.js",
+    "serve": "http-server -p 8000 -o",
+    "serve-https": "http-server -S -p 8443 -o",
+    "deploy": "netlify deploy --prod",
+    "test-pwa": "lighthouse http://localhost:8000 --view --only-categories=pwa"
+  },
+  "keywords": [
+    "finsmart",
+    "admin",
+    "dashboard",
+    "pwa",
+    "progressive-web-app",
+    "analytics",
+    "finance"
+  ],
+  "author": "FinSmart Team",
+  "license": "MIT",
+  "devDependencies": {
+    "http-server": "^14.1.1",
+    "lighthouse": "^11.0.0",
+    "netlify-cli": "^17.0.0",
+    "sharp": "^0.33.5"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/votre-org/finsmart-admin"
+  },
+  "bugs": {
+    "url": "https://github.com/votre-org/finsmart-admin/issues"
+  }
+}

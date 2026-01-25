@@ -1,0 +1,62 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" width="512" height="512">
+  <!-- Gradient Background -->
+  <defs>
+    <linearGradient id="bgGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#4F46E5;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06B6D4;stop-opacity:1" />
+    </linearGradient>
+    <linearGradient id="iconGradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#FFFFFF;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#F0F9FF;stop-opacity:0.9" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background Circle -->
+  <circle cx="256" cy="256" r="256" fill="url(#bgGradient)"/>
+
+  <!-- Chart/Dashboard Icon -->
+  <g transform="translate(128, 128)">
+    <!-- Bar Chart -->
+    <rect x="20" y="140" width="40" height="100" rx="6" fill="url(#iconGradient)" opacity="0.9"/>
+    <rect x="80" y="100" width="40" height="140" rx="6" fill="url(#iconGradient)"/>
+    <rect x="140" y="80" width="40" height="160" rx="6" fill="url(#iconGradient)" opacity="0.9"/>
+    <rect x="200" y="120" width="40" height="120" rx="6" fill="url(#iconGradient)" opacity="0.9"/>
+
+    <!-- Trend Line -->
+    <path d="M 30,180 L 100,140 L 160,110 L 220,150"
+          stroke="#FFFFFF"
+          stroke-width="6"
+          fill="none"
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          opacity="0.7"/>
+
+    <!-- Dollar Sign -->
+    <g transform="translate(180, 20)">
+      <text x="0" y="0"
+            font-family="Arial, sans-serif"
+            font-size="60"
+            font-weight="bold"
+            fill="#FFFFFF"
+            opacity="0.95">$</text>
+    </g>
+
+    <!-- Admin Crown -->
+    <g transform="translate(60, 10)">
+      <path d="M 0,20 L 15,5 L 30,20 L 30,35 L 0,35 Z"
+            fill="#FCD34D"
+            stroke="#F59E0B"
+            stroke-width="2"/>
+      <circle cx="15" cy="8" r="4" fill="#EF4444"/>
+    </g>
+  </g>
+
+  <!-- FinSmart Text (Optional) -->
+  <text x="256" y="460"
+        font-family="Arial, sans-serif"
+        font-size="32"
+        font-weight="bold"
+        fill="#FFFFFF"
+        text-anchor="middle"
+        opacity="0.9">ADMIN</text>
+</svg>
