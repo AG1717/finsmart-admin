@@ -1,7 +1,7 @@
 // Configuration
 // const API_URL = 'https://finsmart-api.geniusmedia.net/api/v1'; // Production Hostilo
-// const API_URL = 'https://finsmart-backend-foc5.onrender.com/api/v1'; // Render.com
-const API_URL = 'http://localhost:3000/api/v1'; // Local testing
+const API_URL = 'https://finsmart-backend.onrender.com/api/v1'; // Render.com
+// const API_URL = 'http://localhost:3000/api/v1'; // Local testing
 
 // State
 let accessToken = localStorage.getItem('adminToken') || '';
