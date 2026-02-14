@@ -1,10 +1,12 @@
 // Configuration
-// const API_URL = 'https://finsmart-backend-chi.vercel.app/api/v1';
-const API_URL = 'http://localhost:3000/api/v1';
+// const API_URL = 'https://finsmart-api.geniusmedia.net/api/v1'; // Production Hostilo
+// const API_URL = 'https://finsmart-backend-foc5.onrender.com/api/v1'; // Render.com
+const API_URL = 'http://localhost:3000/api/v1'; // Local testing
 
 // State
 let accessToken = localStorage.getItem('adminToken') || '';
 let currentPeriod = '7days';
+let autoRefreshInterval = null;
 
 // DOM Elements
 const loginScreen = document.getElementById('loginScreen');
@@ -16,6 +18,8 @@ const adminEmail = document.getElementById('adminEmail');
 const loadingState = document.getElementById('loadingState');
 const metricsContent = document.getElementById('metricsContent');
 const periodBtns = document.querySelectorAll('.period-btn');
+const refreshBtn = document.getElementById('refreshBtn');
+const lastUpdateEl = document.getElementById('lastUpdate');
 
 // Initialize
 document.addEventListener('DOMContentLoaded', () => {
@@ -38,6 +42,30 @@ function showDashboard() {
     const userEmail = localStorage.getItem('adminEmail') || 'Admin';
     adminEmail.textContent = userEmail;
     fetchMetrics(currentPeriod);
+
+    // Start auto-refresh every 30 seconds
+    if (autoRefreshInterval) clearInterval(autoRefreshInterval);
+    autoRefreshInterval = setInterval(() => {
+        fetchMetrics(currentPeriod);
+    }, 30000);
+}
+
+// Refresh button click
+if (refreshBtn) {
+    refreshBtn.addEventListener('click', () => {
+        refreshBtn.classList.add('spinning');
+        fetchMetrics(currentPeriod).then(() => {
+            setTimeout(() => refreshBtn.classList.remove('spinning'), 500);
+        });
+    });
+}
+
+// Update last update time
+function updateLastUpdateTime() {
+    if (lastUpdateEl) {
+        const now = new Date();
+        lastUpdateEl.textContent = `Last updated: ${now.toLocaleTimeString()}`;
+    }
 }
 
 // Login
@@ -97,6 +125,7 @@ async function fetchMetrics(period = '7days') {
     metricsContent.classList.add('hidden');
 
     try {
+        console.log('[DEBUG] Fetching metrics for period:', period);
         const response = await fetch(`${API_URL}/analytics/metrics?period=${period}`, {
             method: 'GET',
             headers: {
@@ -106,12 +135,16 @@ async function fetchMetrics(period = '7days') {
             cache: 'no-store'
         });
 
+        console.log('[DEBUG] Metrics response status:', response.status);
         const data = await response.json();
+        console.log('[DEBUG] Metrics data:', JSON.stringify(data, null, 2));
 
         if (response.ok) {
+            console.log('[DEBUG] Total goals from metrics:', data.data?.overview?.totalGoals);
             displayMetrics(data.data);
             loadingState.classList.add('hidden');
             metricsContent.classList.remove('hidden');
+            updateLastUpdateTime();
         } else {
             if (response.status === 401) {
                 showToast('Session expired. Please login again.', 'error');
@@ -119,6 +152,7 @@ async function fetchMetrics(period = '7days') {
                 localStorage.removeItem('adminToken');
                 showLogin();
             } else {
+                console.error('[DEBUG] Metrics error:', data);
                 showToast('Failed to load metrics', 'error');
             }
         }
@@ -579,6 +613,9 @@ async function fetchGoals(page = 1) {
             ...(status && { status })
         });
 
+        console.log('[DEBUG] Fetching goals with params:', params.toString());
+        console.log('[DEBUG] Token:', accessToken ? accessToken.substring(0, 20) + '...' : 'NO TOKEN');
+
         const response = await fetch(`${API_URL}/admin/goals?${params}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -586,10 +623,14 @@ async function fetchGoals(page = 1) {
             cache: 'no-store'
         });
 
+        console.log('[DEBUG] Response status:', response.status);
         const data = await response.json();
+        console.log('[DEBUG] Response data:', JSON.stringify(data, null, 2));
 
         if (response.ok) {
             if (data.data && data.data.goals) {
+                console.log('[DEBUG] Goals count:', data.data.goals.length);
+                console.log('[DEBUG] Pagination:', data.data.pagination);
                 currentGoalsPage = page;
                 currentGoalsFilters = { category, timeframe, status };
                 displayGoals(data.data.goals, data.data.pagination);
@@ -598,6 +639,7 @@ async function fetchGoals(page = 1) {
                 showToast('Invalid data format received', 'error');
             }
         } else {
+            console.error('[DEBUG] Error response:', data);
             showToast(data.error?.message || 'Failed to load goals', 'error');
         }
     } catch (error) {
@@ -831,6 +873,8 @@ async function fetchNotifications(page = 1) {
             ...(isRead && { isRead })
         });
 
+        console.log('[DEBUG] Fetching notifications with params:', params.toString());
+
         const response = await fetch(`${API_URL}/admin/notifications?${params}`, {
             headers: {
                 'Authorization': `Bearer ${accessToken}`
@@ -838,10 +882,13 @@ async function fetchNotifications(page = 1) {
             cache: 'no-store'
         });
 
+        console.log('[DEBUG] Notifications response status:', response.status);
         const data = await response.json();
+        console.log('[DEBUG] Notifications data:', JSON.stringify(data, null, 2));
 
         if (response.ok) {
             if (data.data && data.data.notifications) {
+                console.log('[DEBUG] Notifications count:', data.data.notifications.length);
                 currentNotificationsPage = page;
                 currentNotificationsFilters = { type, severity, isRead };
                 displayNotifications(data.data.notifications, data.data.pagination);
@@ -850,6 +897,7 @@ async function fetchNotifications(page = 1) {
                 showToast('Invalid data format received', 'error');
             }
         } else {
+            console.error('[DEBUG] Notifications error:', data);
             showToast(data.error?.message || 'Failed to load notifications', 'error');
         }
     } catch (error) {

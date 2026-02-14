@@ -192,6 +192,41 @@ body {
     color: #FFFFFF;
 }
 
+/* Refresh Button */
+.btn-refresh {
+    padding: 12px 24px;
+    border: 2px solid #00C9A7;
+    border-radius: 8px;
+    background: transparent;
+    color: #00C9A7;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    margin-left: auto;
+}
+
+.btn-refresh:hover {
+    background: #00C9A7;
+    color: #FFFFFF;
+}
+
+.btn-refresh.spinning {
+    animation: spin 0.5s linear;
+}
+
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to { transform: rotate(360deg); }
+}
+
+/* Last Update */
+.last-update {
+    color: #666666;
+    font-size: 14px;
+    margin-bottom: 20px;
+    padding-left: 8px;
+}
+
 /* Loading State */
 .loading {
     background: #FFFFFF;
