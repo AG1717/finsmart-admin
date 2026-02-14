@@ -1,6 +1,7 @@
 // Service Worker pour FinSmart Admin PWA
-const CACHE_NAME = 'finsmart-admin-v1';
-const API_CACHE_NAME = 'finsmart-admin-api-v1';
+// Version 2 - Fix: Network First pour app.js pour éviter le cache de l'ancienne API URL
+const CACHE_NAME = 'finsmart-admin-v2';
+const API_CACHE_NAME = 'finsmart-admin-api-v2';
 
 // Fichiers à mettre en cache lors de l'installation
 const STATIC_ASSETS = [
@@ -63,7 +64,12 @@ self.addEventListener('fetch', (event) => {
   if (url.pathname.startsWith('/api/')) {
     event.respondWith(networkFirstStrategy(request));
   }
-  // Stratégie pour les ressources statiques
+  // Network First pour app.js (fichier JavaScript critique qui contient l'URL de l'API)
+  // Ceci garantit que nous chargeons toujours la dernière version
+  else if (url.pathname.endsWith('/app.js')) {
+    event.respondWith(networkFirstStrategy(request));
+  }
+  // Stratégie Cache First pour les autres ressources statiques (CSS, images, etc.)
   else {
     event.respondWith(cacheFirstStrategy(request));
   }

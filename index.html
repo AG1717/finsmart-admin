@@ -384,24 +384,42 @@
 
     <!-- PWA Service Worker Registration -->
     <script>
-        // Enregistrer le Service Worker
+        // Enregistrer le Service Worker avec mise à jour automatique
         if ('serviceWorker' in navigator) {
             window.addEventListener('load', () => {
                 navigator.serviceWorker.register('/service-worker.js')
                     .then((registration) => {
                         console.log('✅ Service Worker enregistré avec succès:', registration.scope);
 
-                        // Vérifier les mises à jour
+                        // Forcer la vérification des mises à jour
+                        registration.update();
+
+                        // Vérifier les mises à jour toutes les 60 secondes
+                        setInterval(() => {
+                            registration.update();
+                        }, 60000);
+
+                        // Gérer les mises à jour
                         registration.addEventListener('updatefound', () => {
                             const newWorker = registration.installing;
+                            console.log('🔄 Nouvelle version du Service Worker détectée');
+
                             newWorker.addEventListener('statechange', () => {
                                 if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
-                                    // Nouvelle version disponible
-                                    if (confirm('Une nouvelle version est disponible. Voulez-vous actualiser ?')) {
+                                    // Nouvelle version disponible - forcer l'activation
+                                    console.log('🆕 Nouvelle version disponible, activation...');
+                                    newWorker.postMessage({ type: 'SKIP_WAITING' });
+                                    // Recharger automatiquement après 1 seconde
+                                    setTimeout(() => {
                                         window.location.reload();
-                                    }
+                                    }, 1000);
                                 }
                             });
+                        });
+
+                        // Détecter quand un nouveau SW prend le contrôle
+                        navigator.serviceWorker.addEventListener('controllerchange', () => {
+                            console.log('🔄 Nouveau Service Worker actif');
                         });
                     })
                     .catch((error) => {
