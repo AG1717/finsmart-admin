@@ -1,7 +1,7 @@
 // Service Worker pour FinSmart Admin PWA
-// Version 2 - Fix: Network First pour app.js pour éviter le cache de l'ancienne API URL
-const CACHE_NAME = 'finsmart-admin-v2';
-const API_CACHE_NAME = 'finsmart-admin-api-v2';
+// Version 3 - Cache bust pour forcer la prise en compte des dernières ressources
+const CACHE_NAME = 'finsmart-admin-v3';
+const API_CACHE_NAME = 'finsmart-admin-api-v3';
 
 // Fichiers à mettre en cache lors de l'installation
 const STATIC_ASSETS = [
